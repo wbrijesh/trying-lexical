@@ -3,7 +3,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   SELECTION_CHANGE_COMMAND,
   FORMAT_TEXT_COMMAND,
-  FORMAT_ELEMENT_COMMAND,
   $getSelection,
   $isRangeSelection,
 } from "lexical";
@@ -14,26 +13,6 @@ import { $isHeadingNode } from "@lexical/rich-text";
 import { $isCodeNode, getDefaultCodeLanguage } from "@lexical/code";
 
 const LowPriority = 1;
-
-function Divider() {
-  return <div className="divider" />;
-}
-
-function getSelectedNode(selection) {
-  const anchor = selection.anchor;
-  const focus = selection.focus;
-  const anchorNode = selection.anchor.getNode();
-  const focusNode = selection.focus.getNode();
-  if (anchorNode === focusNode) {
-    return anchorNode;
-  }
-  const isBackward = selection.isBackward();
-  if (isBackward) {
-    return $isAtNodeEnd(focus) ? anchorNode : focusNode;
-  } else {
-    return $isAtNodeEnd(anchor) ? focusNode : anchorNode;
-  }
-}
 
 export default function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -101,91 +80,31 @@ export default function ToolbarPlugin() {
     );
   }, [editor, updateToolbar]);
 
+  const editorNodes = [
+    { format: "bold", sActive: isBold },
+    { format: "italic", isActive: isItalic },
+    { format: "underline", isActive: isUnderline },
+    { format: "strikethrough", isActive: isStrikethrough },
+    { format: "code", isActive: isCode },
+    { format: "left", isActive: null },
+    { format: "center", isActive: null },
+    { format: "right", isActive: null },
+    { format: "justify", isActive: null },
+  ];
+
   return (
     <div className="toolbar" ref={toolbarRef}>
       <>
-        <button
-          onClick={() => {
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
-          }}
-          className={"toolbar-item spaced " + (isBold ? "active" : "")}
-          aria-label="Format Bold"
-        >
-          <i className="format bold" />
-        </button>
-        <button
-          onClick={() => {
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
-          }}
-          className={"toolbar-item spaced " + (isItalic ? "active" : "")}
-          aria-label="Format Italics"
-        >
-          <i className="format italic" />
-        </button>
-        <button
-          onClick={() => {
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
-          }}
-          className={"toolbar-item spaced " + (isUnderline ? "active" : "")}
-          aria-label="Format Underline"
-        >
-          <i className="format underline" />
-        </button>
-        <button
-          onClick={() => {
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough");
-          }}
-          className={"toolbar-item spaced " + (isStrikethrough ? "active" : "")}
-          aria-label="Format Strikethrough"
-        >
-          <i className="format strikethrough" />
-        </button>
-        <button
-          onClick={() => {
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
-          }}
-          className={"toolbar-item spaced " + (isCode ? "active" : "")}
-          aria-label="Insert Code"
-        >
-          <i className="format code" />
-        </button>
-        <Divider />
-        <button
-          onClick={() => {
-            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left");
-          }}
-          className="toolbar-item spaced"
-          aria-label="Left Align"
-        >
-          <i className="format left-align" />
-        </button>
-        <button
-          onClick={() => {
-            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center");
-          }}
-          className="toolbar-item spaced"
-          aria-label="Center Align"
-        >
-          <i className="format center-align" />
-        </button>
-        <button
-          onClick={() => {
-            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right");
-          }}
-          className="toolbar-item spaced"
-          aria-label="Right Align"
-        >
-          <i className="format right-align" />
-        </button>
-        <button
-          onClick={() => {
-            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify");
-          }}
-          className="toolbar-item"
-          aria-label="Justify Align"
-        >
-          <i className="format justify-align" />
-        </button>{" "}
+        {editorNodes.map((node, index) => (
+          <button
+            onClick={() => {
+              editor.dispatchCommand(FORMAT_TEXT_COMMAND, node.format);
+            }}
+            className={"toolbar-item spaced " + (node.isActive ? "active" : "")}
+          >
+            <i className={`format ${node.format}`} />
+          </button>
+        ))}
       </>
     </div>
   );

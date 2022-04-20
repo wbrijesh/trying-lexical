@@ -735,18 +735,18 @@ i.link {
   background-image: url(/images/icons/link.svg);
 }
 
-i.left-align {
+i.left {
   background-image: url(/images/icons/text-left.svg);
 }
 
-i.center-align {
+i.center {
   background-image: url(/images/icons/text-center.svg);
 }
 
-i.right-align {
+i.right {
   background-image: url(/images/icons/text-right.svg);
 }
 
-i.justify-align {
+i.justify {
   background-image: url(/images/icons/justify.svg);
 }
